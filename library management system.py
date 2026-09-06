@@ -147,50 +147,53 @@ def issuebook():
             bid=int(input('Enter book code: '))
             of=open("Book_details.dat","rb")
             p=pickle.load(of)
-            for i in p:
-                if i[0]==bid:
+            found=False
+            for j in p:
+                if j[0]==bid:
+                    found=True
                     n=datetime.datetime.now()
                     date=n.strftime("%d-%b-%Y")
                     time=n.strftime('%H:%M:%S')
                     dd=n + timedelta(days=7)
                     duedate=dd.strftime('%d-%b-%Y')
-                    l1=[admno,bid,duedate]
+                    l1=[admno,bid,duedate,j[1],j[2],j[3]]
                     l.append(l1)
                     pickle.dump(l,f)
                     print('The following book has been borrowed on',date,'at',time)
                     print('Student with admission number:\t',admno,'\nhas been issued the book with \nBook id:\t',bid,'\nDue Date:\t',duedate,'\n')
                     print('Please return the book borrowed on or before the due date')
                     f.close()
-                    f1=open("book_details.dat","rb")
+                    f1=open("Book_details.dat","rb")
                     l2=pickle.load(f1)
-                    for i in l2:
-                        if i[0]==bid:
-                            l2.remove(i)
+                    for k in l2:
+                        if k[0]==bid:
+                            l2.remove(k)
                     f1.close()
                     f2=open("Book_details.dat","wb")
                     pickle.dump(l2,f2)
                     f2.close()
                     ab=open("Members_details.dat","rb")
                     w=pickle.load(ab)
-                    for i in w:
-                        if i[0]==admno:
-                            w.remove(i)
+                    for m2 in w:
+                        if m2[0]==admno:
+                            w.remove(m2)
+                            break
                     ab.close()
-                    abc=open("Members_details","wb")
+                    abc=open("Members_details.dat","wb")
                     pickle.dump(w,abc)
                     abc.close()
-                else:
-                    print("The following book does not exists. Kindly enter new book.")
+                    break
+            if not found:
+                print("The following book does not exists. Kindly enter new book.")
+            break
        else:
            print("The student name entered does not exist. Kindly enter new student name.")
-        
 
 
 def returnbook():
     from datetime import datetime, timedelta
     f=open('issue_book.dat','rb+')
     l=pickle.load(f)
-    print(l)
     admno=int(input("Enter admission number:"))
     bid=int(input('Enter book code: '))
     for i in l:
@@ -198,26 +201,27 @@ def returnbook():
             n=datetime.now()
             date=n.strftime("%d-%b-%Y")
             time=n.strftime('%H:%M:%S')
-            duedt=datetime.strptime(i[2],"%d-%b-%y")
+            duedt=datetime.strptime(i[2],"%d-%b-%Y")
             if duedt>=n:
                 print('The following book has been returned on',date,'at',time)
                 print('Student with admission number:\t',admno,'\nBook id:\t',bid,'\nReturned Date:\t',date,'\n')
                 print('Thank you for visiting the Library')
             else:
-                print('Student with Admission number:\t',admno,'\nhas returned the book of id\n book id:\t',bid,(x-i[2]).days,'late.\nKindly pay the following fine for the same:\t',7*((x-i[2]).days))
+                print('Student with Admission number:\t',admno,'\nhas returned the book of id\n book id:\t',bid,(n-duedt).days,'late.\nKindly pay the following fine for the same:\t',7*((n-duedt).days))
             l.remove(i)
             f.seek(0)
-            print(l)
             pickle.dump(l,f)
             f.close()
-            o=open("book_details.dat",'rb+')
-            l=pickle.load(o)
-            l.append(i)
-            print(l)
-            pickle.dump(l,o)
-            f.close()
+            o=open("Book_details.dat",'rb+')
+            l2=pickle.load(o)
+            l2.append([i[1],i[3],i[4],i[5]])
+            o.seek(0)
+            pickle.dump(l2,o)
+            o.close()
+            break
     else:
         print("No such record exists.")
+        
 
 def deletemember():
    f=open("Members_details.dat","rb+")
@@ -254,7 +258,9 @@ def deletebook():
          if q in 'Yy':
             m.remove(i)
             print("Book removed")
+            f.seek(0)
             pickle.dump(m,f)
+         break
       else:
          print("Book does not exists")
    
@@ -306,11 +312,11 @@ while True:
                         print(f.center(122))
                         g="6. View Members"
                         print(g.center(124))
-                        h="7.Delete a member"
-                        print(h.center(124))
-                        i="8.Delete a book"
+                        h="7. Delete a member"
+                        print(h.center(126))
+                        i="8. Delete a book"
                         print(i.center(124))
-                        j="7. Exit"
+                        j="9. Exit"
                         print(j.center(116))
                         ch=input("Enter the option number you would like to perform: ")
                         print()
